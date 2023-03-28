@@ -1,0 +1,68 @@
+commit bfb6a13f789c2672f6bd22dc92cfad80c56e4d1f
+Author: krusand <110490348+krusand@users.noreply.github.com>
+Date:   Tue Mar 28 13:24:54 2023 +0200
+
+    Sebastian noob
+
+commit 56908f9a7f1262129c68ee1dd8abf6dda1c315af
+Author: swae <swae@itu.dk>
+Date:   Tue Mar 28 13:23:49 2023 +0200
+
+    Letsgo
+
+commit 34c85cdad1cb650e6fdd5eb7daa30ad1656ed50e
+Author: swae <swae@itu.dk>
+Date:   Tue Mar 28 13:15:28 2023 +0200
+
+    SEJHED
+
+commit a26445e5566045c8c6f3f9ce669709910af8e66d
+Author: swae <swae@itu.dk>
+Date:   Tue Mar 28 13:14:24 2023 +0200
+
+    Added result
+    
+    bla bla bla
+
+commit 4bcc3e185311d7fc0d164e5b0d9e9830dbbc1996
+Merge: 2184209 ad8b8f2
+Author: adam-rosenorn <adam.rosenoern@outlook.dk>
+Date:   Tue Mar 28 13:07:25 2023 +0200
+
+    Merge branch 'main' of https://github.com/krusand/Eksamensprojekt-First-Year-Project
+
+commit 2184209676b632c5a1ddd4fd3dd1f9648b9b400b
+Author: adam-rosenorn <adam.rosenoern@outlook.dk>
+Date:   Tue Mar 28 13:05:02 2023 +0200
+
+    Update Test.ipynb
+
+commit ad8b8f287003bc5215f1d516c479eb628afef907
+Author: krusand <110490348+krusand@users.noreply.github.com>
+Date:   Tue Mar 28 13:04:58 2023 +0200
+
+    Hej
+
+commit 54770d80102804d372582f8e4a8d19185403bdeb
+Author: krusand <110490348+krusand@users.noreply.github.com>
+Date:   Tue Mar 28 12:57:34 2023 +0200
+
+    Sike
+
+commit eb16536913e580405787831800d008a5ab637db5
+Author: Joke Heinks <bhei@itu.dk>
+Date:   Tue Mar 28 12:55:01 2023 +0200
+
+    Added the solution
+
+commit 366e4d91bfbf54132a93c618d0dcf157c3778dfd
+Author: krusand <110490348+krusand@users.noreply.github.com>
+Date:   Tue Mar 28 12:53:17 2023 +0200
+
+    Test
+
+commit f29f345d4049660d4e858a420bd5a5f57a623584
+Author: krusand <110490348+krusand@users.noreply.github.com>
+Date:   Tue Mar 28 12:41:39 2023 +0200
+
+    Initial commit
