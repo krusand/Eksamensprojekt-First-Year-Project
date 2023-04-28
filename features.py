@@ -6,24 +6,30 @@ from skimage.transform import resize
 from skimage import morphology
 from skimage import color
 
-
-
-
 from glob import glob
+
 
 class FeatureReader:
 
-    def extract_features(self, mask_path, img_path, metadata):
+    def extractFeatures(self, mask_path, img_path, metadata):
         image_names = sorted(glob(f"{img_path}/*.png"))
         mask_names = sorted(glob(f"{mask_path}/*.png"))
-        #df = self.__read_metadata(metadata)
+        #df = self.__readMetadata(metadata)
         df = pd.DataFrame()
 
         compactness = []
+        avg_red_channel = []
+        avg_green_channel = []  
+        avg_blue_channel = []
 
         for img, mask in zip(image_names, mask_names):
             mask = color.rgb2gray(plt.imread(mask))
             image = plt.imread(img)[:,:,:3]
+
+            r,g,b = self.__averageColor(image, mask)
+            avg_red_channel.append(r)
+            avg_green_channel.append(g)
+            avg_blue_channel.append(b)
 
             compactness.append(self.__compactness(mask))
 
@@ -31,7 +37,7 @@ class FeatureReader:
 
         return df
 
-    def __read_metadata(self, path):
+    def __readMetadata(self, path):
         return pd.read_csv(path)
 
     def __compactness(self, mask):
@@ -43,9 +49,18 @@ class FeatureReader:
         
         return perimeter**2/(4*np.pi*area)
 
+    def __averageColor(self, img, mask):
+        img[mask == 0] = 0
+        tot_pixels = np.sum(mask)
+        red_avg = np.sum(img[:,:,0]) / tot_pixels
+        green_avg = np.sum(img[:,:,1]) / tot_pixels
+        blue_avg = np.sum(img[:,:,2]) / tot_pixels
+        pixel_color = np.array([red_avg, green_avg, blue_avg])
+        return pixel_color
+
 def main():
     FR = FeatureReader()
-    df = FR.extract_features(mask_path="results", img_path= "img_subset", metadata="metadata.csv")
+    df = FR.extractFeatures(mask_path="results", img_path= "img_subset", metadata="metadata.csv")
     print(df["compactness"].min())
 
 if __name__ == "__main__":
