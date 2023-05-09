@@ -5,8 +5,6 @@ import cv2
 from sklearn.cluster import KMeans
 
 
-com_col_list = []
-
 def get_com_col(cluster, centroids, com_col_list):
     # Get the number of different clusters, create histogram, and normalize
     labels = np.arange(0, len(np.unique(cluster.labels_)) + 1)
@@ -27,7 +25,7 @@ def get_com_col(cluster, centroids, com_col_list):
         start = end
 
 
-def mc_rate(im, mask):
+def is_mc(im, mask, n):
     im2 = im.copy()
     im2[mask == 0] = 0
 
@@ -39,10 +37,18 @@ def mc_rate(im, mask):
             if mask[i][j] != 0:
                 col_list.append(im2[i][j]*256)
     
-    cluster = KMeans(n_clusters=5).fit(col_list)
+    com_col_list = []
+
+    cluster = KMeans(n_clusters=n).fit(col_list)
     get_com_col(cluster, cluster.cluster_centers_, com_col_list)
 
-    col_1 = com_col_list[-1]
-    col_2 = com_col_list[-2]
-            
-    return np.sqrt((col_1[0] - col_2[0])**2 + (col_1[1] - col_2[1])**2 + (col_1[2] - col_2[2])**2)
+    dist_list = []
+    m = len(com_col_list)
+
+    for i in range(0, m-1):
+        j = i + 1
+        col_1 = com_col_list[i]
+        col_2 = com_col_list[j]
+        dist_list.append(np.sqrt((col_1[0] - col_2[0])**2 + (col_1[1] - col_2[1])**2 + (col_1[2] - col_2[2])**2))
+
+    return np.max(dist_list)
