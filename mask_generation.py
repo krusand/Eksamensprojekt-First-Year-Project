@@ -74,15 +74,23 @@ sam.to(device=device)
 # sam.to(device=device)
 
 predictor = SamPredictor(sam)
-
+print("Model loaded")
 images = glob("images/*.png")
 
-
-
 results = glob("results/*.png")
-results = [s.split("/")[-1] for s in results]
+
+# Windows
+results = [s.split("\\")[-1] for s in results]
+
+# Mac
+# results = [s.split("/")[-1] for s in results]
+
 with open("discarded.csv", "r") as f:
     results += [n for n in f.read().strip().split("\n")]
+
+np.random.shuffle(images)
+
+print("Loaded data")
 
 class ImagePoints():
     t = {1:1, 3:0}
@@ -120,11 +128,12 @@ class ImagePoints():
 for image_path in images:
     # for windows
     image_name = image_path[7:] 
+
     # for mac
     # image_name = image_path.split("/")[-1] 
-    if image_name in results or image_name in part[1000:]:
-        continue
     
+    if image_name in results or image_name in part[5:]:
+        continue
     image = cv2.imread(image_path)
     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
