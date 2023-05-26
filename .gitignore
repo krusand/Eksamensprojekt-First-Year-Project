@@ -155,5 +155,5 @@ cython_debug/
 
 Data/
 # Folders
-
+.vscode/settings.json
 data/
