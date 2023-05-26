@@ -22,6 +22,7 @@ class FeatureReader:
         avg_red_channel = []
         avg_green_channel = []
         avg_blue_channel = []
+        multicolor_rate = []
 
         for img, mask in zip(image_names, mask_names):
             mask = plt.imread(mask)
@@ -33,12 +34,13 @@ class FeatureReader:
             avg_blue_channel.append(b)
 
             compactness.append(self.__compactness(mask))
+            multicolor_rate.append(self.get_multicolor_rate(image, mask, 3))
 
         df["compactness"] = compactness
         df["avg_red_channel"] = avg_red_channel
         df["avg_green_channel"] = avg_green_channel
         df["avg_blue_channel"] = avg_blue_channel
-        df['multicolor_rate'] = is_mc
+        df['multicolor_rate'] = multicolor_rate
 
         return df
 
@@ -68,9 +70,7 @@ class FeatureReader:
         return pixel_color
 
 
-<<<<<<< Updated upstream
-=======
-    def get_com_col(cluster, centroids, com_col_list):
+    def get_com_col(sef, cluster, centroids, com_col_list):
         labels = np.arange(0, len(np.unique(cluster.labels_)) + 1)
         (hist, _) = np.histogram(cluster.labels_, bins = labels)
         hist = hist.astype("float")
@@ -88,7 +88,7 @@ class FeatureReader:
             start = end
 
 
-    def is_mc(im, mask, n):
+    def get_multicolor_rate(self, im, mask, n):
         im2 = im.copy()
         im2[mask == 0] = 0
 
@@ -103,7 +103,7 @@ class FeatureReader:
         com_col_list = []
 
         cluster = KMeans(n_clusters=n).fit(col_list)
-        get_com_col(cluster, cluster.cluster_centers_, com_col_list)
+        self.get_com_col(cluster, cluster.cluster_centers_, com_col_list)
 
         dist_list = []
         m = len(com_col_list)
@@ -117,14 +117,12 @@ class FeatureReader:
         return np.max(dist_list)
 
 
->>>>>>> Stashed changes
 def main():
     FR = FeatureReader()
     df = FR.extractFeatures(
         mask_path="results", img_path="img_subset", metadata="metadata.csv"
     )
-    print(df)
-
+    df.to_csv("Data/features.csv")
 
 if __name__ == "__main__":
     main()
