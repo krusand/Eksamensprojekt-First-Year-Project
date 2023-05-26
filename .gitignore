@@ -155,6 +155,7 @@ cython_debug/
 
 
 # Folders
+.Rhistory
 .vscode/settings.json
 data/*
 !data/*.csv
