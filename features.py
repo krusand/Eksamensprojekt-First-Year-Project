@@ -89,6 +89,8 @@ class FeatureReader:
 
 
     def get_multicolor_rate(self, im, mask, n):
+        im = resize(im, (im.shape[0] // 4, im.shape[1] // 4), anti_aliasing=True)
+        mask = resize(mask, (mask.shape[0] // 4, mask.shape[1] // 4), anti_aliasing=True)
         im2 = im.copy()
         im2[mask == 0] = 0
 
