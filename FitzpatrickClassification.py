@@ -6,7 +6,7 @@ import plotly.express as px
 import pandas as pd
 import numpy as np
 
-path = "Data/img subset"
+path = "Data/images"
 images = os.listdir(path)
 
 scores = []

@@ -14,12 +14,15 @@ images = os.listdir(path)
 scores = {}
 
 for image in tqdm(images):
-    whole_image_ita = derm_ita.get_ita(image=Image.open(path + "/" + image))
+    if image == ".DS_Store":
+        continue
+    img = Image.open(path + "/" + image).convert("RGB")
+    whole_image_ita = derm_ita.get_ita(image=img)
     scores[image] = derm_ita.get_fitzpatrick_type(whole_image_ita)
 
 raw_df = pd.read_csv("data/metadata.csv")
 df = raw_df.loc[:, ["img_id", "fitspatrick"]]
-df = df.dropna()
+# df = df.dropna()
 
 img_ids = df["img_id"].values
 fitspatrick_metadata = df["fitspatrick"].values
@@ -33,4 +36,6 @@ for key in scores:
     if metadata_scores[key] == scores[key]:
         count += 1
 
-print(count / len(scores))
+n = len(df["fitspatrick"].dropna().values)
+
+print(count / n)
