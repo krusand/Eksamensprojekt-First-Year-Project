@@ -48,7 +48,7 @@ class FeatureReader:
     def __readMetadata(self, path):
         return pd.read_csv(path)
 
-    def __compactness(self, mask):
+    def compactness(self, mask):
         mask = color.rgb2gray(mask)
         area = np.sum(mask)
 
@@ -58,7 +58,7 @@ class FeatureReader:
 
         return perimeter**2 / (4 * np.pi * area)
 
-    def __averageColor(self, img, mask):
+    def averageColor(self, img, mask):
         img[mask == 0] = 0
         tot_pixels = np.sum(mask)
         red_avg = np.sum(img[:, :, 0]) / tot_pixels
