@@ -120,7 +120,7 @@ class FeatureReader:
 def main():
     FR = FeatureReader()
     df = FR.extractFeatures(
-        mask_path="results", img_path="img_subset", metadata="metadata.csv"
+        mask_path="Data/masks", img_path="Data/images", metadata="metadata.csv"
     )
     df.to_csv("Data/features.csv")
 
