@@ -8,7 +8,6 @@ from skimage import color
 
 from glob import glob
 
-import cv2
 from sklearn.cluster import KMeans
 
 
@@ -79,7 +78,7 @@ class FeatureReader:
         for percent, color in colors:
             if percent > 0.08:
                 com_col_list.append(color)
-                
+
         return com_col_list
             
 
