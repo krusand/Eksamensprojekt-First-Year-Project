@@ -7,6 +7,7 @@ from skimage import morphology
 from skimage import color
 
 from glob import glob
+from tqdm import tqdm
 
 import cv2
 from sklearn.cluster import KMeans
@@ -24,15 +25,16 @@ class FeatureReader:
         avg_blue_channel = []
         multicolor_rate = []
 
-        for img, mask in zip(image_names, mask_names):
+        for img, mask in tqdm(zip(image_names, mask_names)):
             mask = plt.imread(mask)
             image = plt.imread(img)[:, :, :3]
             mask = resize(mask, output_shape=image.shape)
+            mask = color.rgb2gray(mask)
+
             r, g, b = self.__averageColor(image, mask)
             avg_red_channel.append(r)
             avg_green_channel.append(g)
             avg_blue_channel.append(b)
-
             compactness.append(self.__compactness(mask))
             multicolor_rate.append(self.get_multicolor_rate(image, mask, 3))
 
@@ -50,7 +52,7 @@ class FeatureReader:
 
 
     def __compactness(self, mask):
-        mask = color.rgb2gray(mask)
+        # mask = color.rgb2gray(mask)
         area = np.sum(mask)
 
         struct_el = morphology.disk(3)
@@ -77,7 +79,7 @@ class FeatureReader:
         hist /= hist.sum()
 
         rect = np.zeros((50, 300, 3), dtype=np.uint8)
-        colors = sorted([(percent, color) for (percent, color) in zip(hist, centroids)])
+        colors = sorted([(percent, color) for (percent, color) in zip(hist, centroids)], key= lambda x:x[0])
         start = 0
         for (percent, color) in colors:
             if percent > 0.08:
@@ -89,6 +91,7 @@ class FeatureReader:
 
 
     def get_multicolor_rate(self, im, mask, n):
+        # mask = color.rgb2gray(mask)
         im = resize(im, (im.shape[0] // 4, im.shape[1] // 4), anti_aliasing=True)
         mask = resize(mask, (mask.shape[0] // 4, mask.shape[1] // 4), anti_aliasing=True)
         im2 = im.copy()
@@ -104,11 +107,16 @@ class FeatureReader:
         
         com_col_list = []
 
-        cluster = KMeans(n_clusters=n).fit(col_list)
+        if len(col_list) == 0:
+            return "UNK"
+        cluster = KMeans(n_clusters=n, n_init=10).fit(col_list)
         self.get_com_col(cluster, cluster.cluster_centers_, com_col_list)
 
         dist_list = []
         m = len(com_col_list)
+
+        if m <= 1:
+            return "UNK "
 
         for i in range(0, m-1):
             j = i + 1
@@ -118,6 +126,15 @@ class FeatureReader:
 
         return np.max(dist_list)
 
+    def __asymetry(self, mask):
+        # mask = color.rgb2gray(mask)
+        scores = []
+        for _ in range(6):
+            segment = self.__crop(mask)
+            (np.sum(segment))
+            scores.append(np.sum(np.logical_xor(segment, np.flip(segment))) / (np.sum(segment)))
+            mask = rotate(mask, 30)
+        return sum(scores) / len(scores)
 
 def main():
     FR = FeatureReader()
