@@ -7,6 +7,9 @@ from skimage.draw import polygon
 from skimage.transform import resize
 from skimage.filters import threshold_otsu
 
+# This file is used to create masks using basic segmentation methods.
+# The methods used are active contour, and otsu threshold
+
 
 def loadImg(path, resize_image=False, color=False):
     """
