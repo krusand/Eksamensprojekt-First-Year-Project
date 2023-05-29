@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 from skimage.transform import resize
+from skimage.transform import rotate
 from skimage import morphology
 from skimage import color
 
@@ -110,14 +111,17 @@ class FeatureReader:
                 if mask[i][j] != 0:
                     col_list.append(im2[i][j] * 256)
 
-        cluster = KMeans(n_clusters=n).fit(col_list)
+        if len(col_list) == 0:
+            return ""
+
+        cluster = KMeans(n_clusters=n, n_init=10).fit(col_list)
         com_col_list = self.get_com_col(cluster, cluster.cluster_centers_)
 
         dist_list = []
         m = len(com_col_list)
 
         if m <= 1:
-            return "UNK "
+            return ""
 
         for i in range(0, m - 1):
             j = i + 1
