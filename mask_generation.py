@@ -6,7 +6,7 @@ from glob import glob
 from tqdm import tqdm
 import os
 
-# To use the script, run the script.
+# Uses SAM from Meta AI
 # When an image comes up left click to select an area based on the model. Right click to deselect an area.
 # Press q to update an image. Press e,q to save an image. Press d,q to discard an image.
 # Press r,q to reset an image. Press m,q to save and manually edit the mask
