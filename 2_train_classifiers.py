@@ -2,13 +2,13 @@ import numpy as np
 import pandas as pd
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.model_selection import train_test_split
-import matplotlib.pyplot as plt
 from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import StandardScaler
 
 
 # loading and preparing data
 raw_df = pd.read_csv("metadata.csv")
+features = pd.read_csv("features.csv")
 COI = ["diagnostic", "age", "itch", "grew", "hurt", "changed", "bleed", "elevation", "biopsed"]
 COI2 = ["diagnostic", "age", "itch", "grew", "hurt", "changed", "bleed", "elevation", "biopsed", "fitspatrick"]
 df = raw_df.loc[:,COI]
@@ -25,10 +25,10 @@ df2 = df2.dropna()
 y = df["diagnostic"]
 X = df.drop("diagnostic",axis=1)
 cancers = {"BCC":1, "MEL":1, "SCC": 1, "ACK": 0, "NEV":0, "SEK":0}
+y = y.replace(cancers)
 
 
 # KNN-classifiers
-y = y.replace(cancers)
 X_train, X_test, y_train, y_test = train_test_split(X, y,test_size=0.25, train_size=0.75)
 knnc = KNeighborsClassifier(n_neighbors=20)
 
