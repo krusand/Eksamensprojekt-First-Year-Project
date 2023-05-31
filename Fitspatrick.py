@@ -11,7 +11,7 @@ def classify_fitspatrick_score(img_path):
     classifications = []
     images = os.listdir(img_path)
     for image in images:
-        whole_image_ita = derm_ita.get_ita(image=Image.open(path + "/" + image))
+        whole_image_ita = derm_ita.get_ita(image=Image.open(img_path + "/" + image))
         classifications.append(derm_ita.get_fitzpatrick_type(whole_image_ita))
     return classifications
 
