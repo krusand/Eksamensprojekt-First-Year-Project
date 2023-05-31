@@ -9,6 +9,7 @@ from sklearn.metrics import accuracy_score, roc_auc_score
 SEED = 42
 METADATA_PATH = "Data/metadata.csv"
 FEATURES_PATH = "Data/features.csv"
+MODE = "all_data"
 
 # loading and preparing data
 metadata = pd.read_csv(METADATA_PATH)
@@ -19,24 +20,27 @@ def train_test_val_split(X, y, train_size = 0.7, test_size = 0.2, val_size = 0.1
     x_train, x_test, y_train, y_test = train_test_split(x_train, y_train, train_size = train_size / (1-val_size))
     return x_train, x_test, x_val, y_train, y_test, y_val
 
+
 df = pd.merge(metadata, features, left_on= "img_id", right_on= "image_names")
-
-
-COI = ["diagnostic", "age", "itch", "grew", "hurt", "changed", "bleed", "elevation", "biopsed"]
-COI2 = ["diagnostic", "age", "itch", "grew", "hurt", "changed", "bleed", "elevation", "biopsed", "fitspatrick"]
-df1 = df.loc[:,COI]
-df2 = df.loc[:,COI2]
-df = df1.dropna()
-df2 = df2.dropna()
+COI = ["diagnostic", "age", "itch", "grew", "hurt", "changed", "bleed", "elevation", "biopsed", "compactness", "multicolor_rate", "asymmetry"]
+df = df.loc[:,COI]
+ddf = df.dropna()
 COIbool = ["itch", "grew", "hurt", "changed", "bleed", "elevation", "biopsed"]
 d = {"False": 0, "True": 1, False: 0, True:1, "UNK": 0.5}
 for col in COIbool:
-    df2[col] = df2[col].replace(d)
     df[col] = df[col].replace(d)
 df = df.dropna()
-df2 = df2.dropna()
+
+modes = {
+    "features" : ["compactness", "multicolor_rate", "asymmetry"],
+    "all_data" : ["age", "itch", "grew", "hurt", "changed", "bleed", "elevation", "biopsed", "compactness", "multicolor_rate", "asymmetry"],
+    "metadata" : ["age", "itch", "grew", "hurt", "changed", "bleed", "elevation", "biopsed",],
+}
+mode = modes[MODE]
+
 y = df["diagnostic"]
-X = df.drop("diagnostic",axis=1)
+X = df[mode]
+
 cancers = {"BCC":1, "MEL":1, "SCC": 1, "ACK": 0, "NEV":0, "SEK":0}
 y = y.replace(cancers)
 
