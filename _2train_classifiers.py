@@ -28,13 +28,14 @@ cancers = {"BCC":1, "MEL":1, "SCC": 1, "ACK": 0, "NEV":0, "SEK":0}
 y = y.replace(cancers)
 
 
+scalar = StandardScaler()
+X_norm = scalar.fit_transform(X)
+X_train, X_test, y_train, y_test = train_test_split(X_norm, y,test_size=0.25, train_size=0.75)
+
 # KNN-classifiers
-X_train, X_test, y_train, y_test = train_test_split(X, y,test_size=0.25, train_size=0.75)
 knnc = KNeighborsClassifier(n_neighbors=20)
 
 
 # logistic regression
-scalar = StandardScaler()
-X_norm = scalar.fit_transform(X)
-X_train, X_test, y_train, y_test = train_test_split(X_norm, y,test_size=0.25, train_size=0.75)
 clf  = LogisticRegression().fit(X = X_train, y = y_train)
+
