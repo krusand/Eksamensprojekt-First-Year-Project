@@ -5,6 +5,7 @@ from tqdm import tqdm
 import plotly.express as px
 import pandas as pd
 import numpy as np
+import math
 
 
 def classify_fitspatrick_score(img_path):
@@ -17,7 +18,7 @@ def classify_fitspatrick_score(img_path):
 
 
 def create_plot(classifications):
-    data = np.unique(classifications, return_counts=True)
+    data = np.unique(list(classifications.values()), return_counts=True)
     n = sum(data[1])
 
     df = pd.DataFrame(
@@ -59,8 +60,8 @@ def create_plot(classifications):
     return fig
 
 
-def save_plot(path, fig):
-    fig.write_image(f"{path}/FitzPatricksScores.png")
+def save_plot(fig):
+    fig.write_image(f"image/FitzPatricksScores.png")
 
 
 def compare_fitspatrick_scores(classifications, comparison_path):
@@ -82,22 +83,18 @@ def compare_fitspatrick_scores(classifications, comparison_path):
     return count / len(classifications)
 
 
-def mean_average_difference_fitspatrick(classifications, comparison_path):
-    # function assumes classifications is a dataframe
-    # containing the columns "img_id" and "fitspatrick"
-
-    # load metadata
-    raw_df = pd.read_csv(f"{comparison_path}/metadata.csv")
-    df = raw_df.loc[:, ["img_id", "fitspatrick"]]
-    df = df.dropna()
-
+def preparedata(classifications, metadata, convert=False):
     # create metadata dictionary
-    img_ids = df["img_id"].values
-    fitspatrick_metadata = df["fitspatrick"].values
-
-    metadata_scores = {
-        img_ids[i]: int(fitspatrick_metadata[i]) for i in range(len(img_ids))
-    }
+    img_ids = metadata["img_id"].values
+    fitspatrick_metadata = metadata["fitspatrick"].values
+    if convert:
+        metadata_scores = {
+            img_ids[i]: int(fitspatrick_metadata[i]) for i in range(len(img_ids))
+        }
+    else:
+        metadata_scores = {
+            img_ids[i]: fitspatrick_metadata[i] for i in range(len(img_ids))
+        }
 
     # create classification dictionary
     img_ids_class = classifications["img_id"].values
@@ -106,7 +103,10 @@ def mean_average_difference_fitspatrick(classifications, comparison_path):
     classifications_dict = {
         img_ids_class[i]: int(fitspatrick_class[i]) for i in range(len(img_ids_class))
     }
+    return classifications_dict, metadata_scores
 
+
+def mean_average_difference_fitspatrick(classifications_dict, metadata_scores):
     absolute_difference = 0
 
     # calculate absolute difference between predicted and true fitspatrick score
@@ -115,3 +115,34 @@ def mean_average_difference_fitspatrick(classifications, comparison_path):
 
     mean_absolute_difference = absolute_difference / len(metadata_scores)
     return mean_absolute_difference
+
+
+def interpolate_fitspatrick_metadata(classifications_dict, metadata_scores):
+    for key in metadata_scores:
+        if math.isnan(metadata_scores[key]):
+            metadata_scores[key] = classifications_dict[key]
+        else:  # fitspatrick score is a float so convert
+            metadata_scores[key] = int(metadata_scores[key])
+    return metadata_scores
+
+
+def main():
+    raw_df = pd.read_csv("data/metadata.csv")
+    df = raw_df.loc[:, ["img_id", "fitspatrick"]]
+    classifications = pd.read_csv("data/fits.csv")
+    classifications, metadata_scores = preparedata(classifications, df)
+
+    # Calculate mean absolute difference
+    # mean_average_difference_fitspatrick(classifications, metadata_scores)
+
+    # interpolate fitspatrick
+    fitspatrick_scores = interpolate_fitspatrick_metadata(
+        classifications, metadata_scores
+    )
+
+    fig = create_plot(fitspatrick_scores)
+    save_plot(fig)
+
+
+if __name__ == "__main__":
+    main()
