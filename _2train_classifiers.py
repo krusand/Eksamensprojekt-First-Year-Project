@@ -215,13 +215,14 @@ def one_outs_main(generate_classifier, k=500):
     return accuracies, np.median(baselines)
 
 def confusion_matrices():
-    for x_type in ["features_cols", "all_data"]:
-        for y_type in ["cancer", "all"]:
-            X_train, X_test, X_val, y_train, y_test, y_val = dataset(df, x_mode, y_mode, Pca= False, StandardScalar= True)
+    # for x_type in ["features_cols", "all_data"]:
+    # for y_type in ["cancer", "all"]:
+    # for classifier in [generate_logistic_regression, generate_knn]:
+    
+    X_train, X_test, X_val, y_train, y_test, y_val = dataset(df, "feature_cols", "cancer", Pca= False, StandardScalar= True)
             
-            for classifier in [generate_logistic_regression, generate_knn]:
-                prediction = classifier(X_train, X_test, y_train, y_test, returnP = True)
-                display_confusion_matrix(y_test, prediction)
+    prediction = generate_knn(X_train, X_test, y_train, y_test, returnP = True)
+    display_confusion_matrix(y_test, prediction)
 
 def plot_boxplot(k = 500):
     accuracies_knn, baseline_knn = one_outs_main(generate_knn, k = k)

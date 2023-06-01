@@ -17,10 +17,11 @@ def rocauc_score(x_test, y_test, classifier):
 
 
 # confusion matrix
-def confusion_matrix(y_test, predictions, classifier):
+def display_confusion_matrix(y_test, predictions, classifier, title = "Confusion Matrix"):
     cm = confusion_matrix(y_test, predictions, labels=classifier.classes_)
     disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=classifier.classes_)
     disp.plot()
+    disp.ax_.set_title(title)
     plt.show()
 
 
