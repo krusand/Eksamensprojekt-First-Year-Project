@@ -80,3 +80,38 @@ def compare_fitspatrick_scores(classifications, comparison_path):
             count += 1
 
     return count / len(classifications)
+
+
+def mean_average_difference_fitspatrick(classifications, comparison_path):
+    # function assumes classifications is a dataframe
+    # containing the columns "img_id" and "fitspatrick"
+
+    # load metadata
+    raw_df = pd.read_csv(f"{comparison_path}/metadata.csv")
+    df = raw_df.loc[:, ["img_id", "fitspatrick"]]
+    df = df.dropna()
+
+    # create metadata dictionary
+    img_ids = df["img_id"].values
+    fitspatrick_metadata = df["fitspatrick"].values
+
+    metadata_scores = {
+        img_ids[i]: int(fitspatrick_metadata[i]) for i in range(len(img_ids))
+    }
+
+    # create classification dictionary
+    img_ids_class = classifications["img_id"].values
+    fitspatrick_class = classifications["fitspatrick"].values
+
+    classifications_dict = {
+        img_ids_class[i]: int(fitspatrick_class[i]) for i in range(len(img_ids_class))
+    }
+
+    absolute_difference = 0
+
+    # calculate absolute difference between predicted and true fitspatrick score
+    for key in metadata_scores:
+        absolute_difference += np.abs(metadata_scores[key] - classifications_dict[key])
+
+    mean_absolute_difference = absolute_difference / len(metadata_scores)
+    return mean_absolute_difference
