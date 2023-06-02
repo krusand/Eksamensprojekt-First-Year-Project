@@ -54,10 +54,10 @@ def dump_classifier():
     classifier = LogisticRegression()
     classifier.fit(X, y)
 
-    filename = 'final_classifier.sav'
+    filename = 'group07_classifier.sav'
     pickle.dump(classifier, open(filename, 'wb'))   
     
-    filename = 'final_scalar.sav'
+    filename = 'group07_scalar.sav'
     pickle.dump(scalar, open(filename, 'wb'))
 
 # Data Utils
@@ -284,9 +284,9 @@ def main():
     #             file = "knn_curve_ours.png")
 
     # Boxplot the different F1 - Score one feature out
-    one_out_boxplot(df = df, x_mode = "no_metadata", y_mode= "cancers", repetitions = 200,
-                title = "F1 score for model using our features taking one feature out",
-                y_limit = (0.55, 0.95))
+    # one_out_boxplot(df = df, x_mode = "no_metadata", y_mode= "cancers", repetitions = 200,
+    #             title = "F1 score for model using our features taking one feature out",
+    #             y_limit = (0.55, 0.95))
     # one_out_boxplot(df = df, x_mode = "all_data", y_mode= "cancers", repetitions = 200,
     #             title = "F1 score for model using all features taking one feature out",
     #             y_limit = (0.55, 0.95))
@@ -361,7 +361,7 @@ def main():
     # plt.show()
 
     # Generate classifier:
-    # dump_classifier()
+    dump_classifier()
 
 
 if __name__ == "__main__":
