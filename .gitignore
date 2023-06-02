@@ -156,6 +156,7 @@ cython_debug/
 
 # Folders
 
+plots/*
 .vscode/settings.json
 data/*
 !data/*.csv

@@ -27,6 +27,10 @@ def extractFeatures(mask_path, img_path, metadata):
     avg_blue_channel = []
     multicolor_rate = []
     asymmetry = []
+
+    average_hue = []
+    average_saturation = []
+    average_value = []
     
     for name in tqdm(names[:50]):
         mask = plt.imread(os.path.join(mask_path, name))
@@ -47,6 +51,11 @@ def extractFeatures(mask_path, img_path, metadata):
         compactness.append(get_compactness(mask))
         multicolor_rate.append(get_multicolor_rate(image, mask, 3))
         asymmetry.append(get_asymmetry(mask))
+        
+        h, s, v = averageColorHSV(image, mask)
+        average_hue.append(h)
+        average_saturation.append(s)
+        average_value.append(v)
 
     df["image_names"] = image_names
     df["compactness"] = compactness
@@ -55,6 +64,10 @@ def extractFeatures(mask_path, img_path, metadata):
     df["avg_blue_channel"] = avg_blue_channel
     df["multicolor_rate"] = multicolor_rate
     df["asymmetry"] = asymmetry
+
+    df["average_hue"] = average_hue
+    df["average_saturation"] = average_saturation
+    df["average_value"] = average_value
 
     return df
 
@@ -79,6 +92,17 @@ def get_compactness(mask):
     return perimeter**2 / (4 * np.pi * area)
 
 def averageColor(img, mask):
+    img[mask == 0] = 0
+    tot_pixels = np.sum(mask)
+    red_avg = np.sum(img[:, :, 0]) / tot_pixels
+    green_avg = np.sum(img[:, :, 1]) / tot_pixels
+    blue_avg = np.sum(img[:, :, 2]) / tot_pixels
+    pixel_color = np.array([red_avg, green_avg, blue_avg])
+    return pixel_color
+
+def averageColorHSV(img, mask):
+    img = color.rgb2hsv(img)
+
     img[mask == 0] = 0
     tot_pixels = np.sum(mask)
     red_avg = np.sum(img[:, :, 0]) / tot_pixels
