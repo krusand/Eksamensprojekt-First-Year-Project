@@ -13,6 +13,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from tqdm import tqdm
 import os
+import pickle
 
 SEED = 30
 METADATA_PATH = "Data/metadata.csv"
@@ -37,7 +38,27 @@ Y_MODES = {
     "all" : {"BCC":1, "MEL":2, "SCC": 3, "ACK": 4, "NEV":5, "SEK":6},
 }
 
+# Final Classifier
 
+def dump_classifier():
+    df = load_data(METADATA_PATH, FEATURES_PATH)
+
+    y = df["diagnostic"]
+    X = df[X_MODES["features_cols"]]
+    y = y.replace(Y_MODES["cancers"])
+
+
+    scalar = StandardScaler().fit(X)
+    X = scalar.transform(X)
+
+    classifier = LogisticRegression()
+    classifier.fit(X, y)
+
+    filename = 'final_classifier.sav'
+    pickle.dump(classifier, open(filename, 'wb'))   
+    
+    filename = 'final_scalar.sav'
+    pickle.dump(scalar, open(filename, 'wb'))
 
 # Data Utils
 
@@ -306,6 +327,7 @@ def main():
     # logistic_predict()
 
     # Generate classifier:
+    dump_classifier()
 
 
 if __name__ == "__main__":
