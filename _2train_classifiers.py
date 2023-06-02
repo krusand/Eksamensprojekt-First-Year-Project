@@ -143,7 +143,7 @@ def knn_predict(X_train, X_val, y_train, y_val, k = 5):
 
     return knnc.predict(X_val)
 
-def logistic_predict(X_train, X_val, y_train, y_val, returnP = False):
+def logistic_predict(X_train, X_val, y_train, y_val):
     """Train a Logistic Regression classifier and predict values"""
     clf  = LogisticRegression(multi_class= "multinomial").fit(X = X_train, y = y_train)
     return clf.predict(X_val)
@@ -322,9 +322,24 @@ def main():
     #                       file = "ConfusionLogiOur.png")
     
 
-    # F1 - scores
-    # knn_predict()
-    # logistic_predict()
+    # Print Reporting metrics
+    X_train, X_val, X_test, y_train, y_val, y_test = dataset(df, X_MODES["features_cols"], Y_MODES["cancers"], StandardScalar = True, seed=12)
+    
+    X = np.concatenate((X_train, X_val))
+    y = np.concatenate((y_train, y_val))
+    
+    knn_preds = knn_predict(X, X_test, y, None)
+    logistic_preds = logistic_predict(X,X_test, y, None)
+
+    print((f"Scores KNN:\n"
+          f"    Accuracy = {accuracy_score(y_test, knn_preds)} \n"
+          f"    ROC = {roc_auc_score(y_test, knn_preds)} \n"
+          f"    F1 = {f1_score(y_test, knn_preds)} \n"
+          f"Scores Logistic Regression:\n"
+          f"    Accuracy = {accuracy_score(y_test, logistic_preds)} \n"
+          f"    ROC = {roc_auc_score(y_test, logistic_preds)} \n"
+          f"    F1 = {f1_score(y_test, logistic_preds)} \n"
+          ))
 
     # Generate classifier:
     dump_classifier()
