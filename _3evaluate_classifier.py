@@ -31,8 +31,8 @@ def display_confusion_matrix(y_test, predictions, classifier, title = "Confusion
 def classify(img, mask):
     features = features2Dataframe(img, mask)
 
-    classifier = pickle.load(open('final_classifier.sav', 'rb'))
-    scalar = pickle.load(open('final_scalar.sav', 'rb'))
+    classifier = pickle.load(open('group07_classifier.sav', 'rb'))
+    scalar = pickle.load(open('group07_scalar.sav', 'rb'))
 
     features = scalar.transform(features)
 
