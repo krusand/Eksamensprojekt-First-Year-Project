@@ -127,7 +127,7 @@ def one_out_datasets(df, x_mode, y_mode, StandardScalar = False, k = 10):
 
     datasets = []
     for mode in x_one_out:
-        datasets.append([dataset(df, x_mode, y_mode, StandardScalar = StandardScalar, seed= None) for _ in range(k)])
+        datasets.append([dataset(df, mode, y_mode, StandardScalar = StandardScalar, seed= None) for _ in range(k)])
 
     return datasets
 
@@ -143,9 +143,12 @@ def knn_predict(X_train, X_val, y_train, y_val, k = 5):
 
     return knnc.predict(X_val)
 
-def logistic_predict(X_train, X_val, y_train, y_val):
+def logistic_predict(X_train, X_val, y_train, y_val, probs = False):
     """Train a Logistic Regression classifier and predict values"""
     clf  = LogisticRegression(multi_class= "multinomial").fit(X = X_train, y = y_train)
+
+    if probs:
+        return (clf.predict(X_val), clf.predict_proba(X_val)[:, 1])
     return clf.predict(X_val)
 
 
@@ -281,9 +284,9 @@ def main():
     #             file = "knn_curve_ours.png")
 
     # Boxplot the different F1 - Score one feature out
-    # one_out_boxplot(df = df, x_mode = "no_metadata", y_mode= "cancers", repetitions = 200,
-    #             title = "F1 score for model using our features taking one feature out",
-    #             y_limit = (0.55, 0.95))
+    one_out_boxplot(df = df, x_mode = "no_metadata", y_mode= "cancers", repetitions = 200,
+                title = "F1 score for model using our features taking one feature out",
+                y_limit = (0.55, 0.95))
     # one_out_boxplot(df = df, x_mode = "all_data", y_mode= "cancers", repetitions = 200,
     #             title = "F1 score for model using all features taking one feature out",
     #             y_limit = (0.55, 0.95))
@@ -323,38 +326,38 @@ def main():
     
 
     # Print Reporting metrics
-    X_train, X_val, X_test, y_train, y_val, y_test = dataset(df, X_MODES["features_cols"], Y_MODES["cancers"], StandardScalar = True, seed=12)
+    # X_train, X_val, X_test, y_train, y_val, y_test = dataset(df, X_MODES["features_cols"], Y_MODES["cancers"], StandardScalar = True, seed=12)
     
-    X = np.concatenate((X_train, X_val))
-    y = np.concatenate((y_train, y_val))
+    # X = np.concatenate((X_train, X_val))
+    # y = np.concatenate((y_train, y_val))
     
-    knn_preds = knn_predict(X, X_test, y, None)
-    logistic_preds = logistic_predict(X,X_test, y, None)
+    # knn_preds = knn_predict(X, X_test, y, None)
 
-    print((f"Scores KNN:\n"
-          f"    Accuracy = {accuracy_score(y_test, knn_preds)} \n"
-          f"    ROC = {roc_auc_score(y_test, knn_preds)} \n"
-          f"    F1 = {f1_score(y_test, knn_preds)} \n"
-          f"Scores Logistic Regression:\n"
-          f"    Accuracy = {accuracy_score(y_test, logistic_preds)} \n"
-          f"    ROC = {roc_auc_score(y_test, logistic_preds)} \n"
-          f"    F1 = {f1_score(y_test, logistic_preds)} \n"
-          ))
+    # logistic_preds, logistic_probs = logistic_predict(X,X_test, y, None, probs= True)
 
-    cm = confusion_matrix(y_test, knn_preds, labels=[0,1])
-    disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=[0,1])
-    disp.plot(text_kw={"fontsize" : 25})
-    disp.ax_.set_title("Confusion Matrix using final classifier")
+    # print((f"Scores KNN:\n"
+    #       f"    Accuracy = {accuracy_score(y_test, knn_preds)} \n"
+    #       f"    F1 = {f1_score(y_test, knn_preds)} \n"
+    #       f"Scores Logistic Regression:\n"
+    #       f"    Accuracy = {accuracy_score(y_test, logistic_preds)} \n"
+    #       f"    ROC = {roc_auc_score(y_test, logistic_probs)} \n"
+    #       f"    F1 = {f1_score(y_test, logistic_preds)} \n"
+    #       ))
 
-    plt.savefig(os.path.join("plots", "ConfTestKnn.png")) 
-    # plt.show()
+    # cm = confusion_matrix(y_test, knn_preds, labels=[0,1])
+    # disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=[0,1])
+    # disp.plot(text_kw={"fontsize" : 25})
+    # disp.ax_.set_title("Confusion Matrix using final classifier")
 
-    cm = confusion_matrix(y_test, logistic_preds, labels=[0,1])
-    disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=[0,1])
-    disp.plot(text_kw={"fontsize" : 25})
-    disp.ax_.set_title("Confusion Matrix using final classifier")
+    # plt.savefig(os.path.join("plots", "ConfTestKnn.png")) 
+    # # plt.show()
 
-    plt.savefig(os.path.join("plots", "ConfTestLogi.png")) 
+    # cm = confusion_matrix(y_test, logistic_preds, labels=[0,1])
+    # disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=[0,1])
+    # disp.plot(text_kw={"fontsize" : 25})
+    # disp.ax_.set_title("Confusion Matrix using final classifier")
+
+    # plt.savefig(os.path.join("plots", "ConfTestLogi.png")) 
     # plt.show()
 
     # Generate classifier:
