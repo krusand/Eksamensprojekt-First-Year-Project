@@ -341,8 +341,24 @@ def main():
           f"    F1 = {f1_score(y_test, logistic_preds)} \n"
           ))
 
+    cm = confusion_matrix(y_test, knn_preds, labels=[0,1])
+    disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=[0,1])
+    disp.plot(text_kw={"fontsize" : 25})
+    disp.ax_.set_title("Confusion Matrix using final classifier")
+
+    plt.savefig(os.path.join("plots", "ConfTestKnn.png")) 
+    # plt.show()
+
+    cm = confusion_matrix(y_test, logistic_preds, labels=[0,1])
+    disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=[0,1])
+    disp.plot(text_kw={"fontsize" : 25})
+    disp.ax_.set_title("Confusion Matrix using final classifier")
+
+    plt.savefig(os.path.join("plots", "ConfTestLogi.png")) 
+    # plt.show()
+
     # Generate classifier:
-    dump_classifier()
+    # dump_classifier()
 
 
 if __name__ == "__main__":

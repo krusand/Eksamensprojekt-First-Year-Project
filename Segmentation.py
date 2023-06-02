@@ -76,3 +76,19 @@ def otsuThreshold(img):
     """
     threshold = threshold_otsu(img)
     return img < threshold
+
+
+def dice_coef(y_true, y_pred):
+    """Calculates the dice score between y_true and y_pred
+
+    Args:
+        y_true : gt mask
+        y_pred : pred mask
+
+    Returns:
+        float: Dice coef
+    """
+    y_true = np.ndarray.flatten(y_true)
+    y_pred = np.ndarray.flatten(y_pred)
+    intersection = np.sum(y_true * y_pred)
+    return (2. * intersection) / (np.sum(y_true) + np.sum(y_pred))
