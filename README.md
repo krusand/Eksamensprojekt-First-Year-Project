@@ -9,4 +9,6 @@ By using the metadata and the extracted features, it is possible to train a seri
 
 To evaluate our chosen classifier, use the `_3evaluate_classifier.py` file. The file contains a function `classify` which takes an unknown image and mask as input and outputs the probability of the masked image being cancerous. The `classify` function is provided with the correct classifier saved in the root directory as a *.sav* file. `classify` imports the function `features2Dataframe` which extracts features from the provided image. 
 
+The segmentation was done using more simple methods. These are found in `Segmentation.py`. We also segmented the images using [Segment Anything Model (SAM)](https://github.com/facebookresearch/segment-anything), created by META AI. 
+
 The image data along with the metadata used for the project is provided by Mendeley Data and can be found [here](https://data.mendeley.com/datasets/zr7vgbcyr2/)
