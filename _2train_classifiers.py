@@ -6,7 +6,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import accuracy_score, roc_auc_score, f1_score
 from sklearn.decomposition import PCA
-from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
+from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay, RocCurveDisplay
 
 
 import matplotlib.pyplot as plt
@@ -136,11 +136,13 @@ def one_out_datasets(df, x_mode, y_mode, StandardScalar = False, k = 10):
 
 # Generate Predictions
 
-def knn_predict(X_train, X_val, y_train, y_val, k = 5):
+def knn_predict(X_train, X_val, y_train, y_val, k = 5, probs = False):
     """Train a KNN classifier and predict values"""
     knnc = KNeighborsClassifier(n_neighbors = k)
     knnc.fit(X_train, y_train)
 
+    if probs:
+        return (knnc.predict(X_val), knnc.predict_proba(X_val)[:, 1])
     return knnc.predict(X_val)
 
 def logistic_predict(X_train, X_val, y_train, y_val, probs = False):
@@ -269,7 +271,68 @@ def create_confusion_matrix(df, x_mode, y_mode,classifier, title, file):
 
     plt.savefig(os.path.join("plots", file)) 
     plt.show()
+
+def plot_roc_curves(df, final = False, plot = False, save = False):
+    X_train, X_val, X_test, y_train, y_val, y_test = dataset(df, X_MODES["features_cols"], Y_MODES["cancers"], StandardScalar = True, seed=12)
     
+    if final:
+        X_train = np.concatenate((X_train, X_val))
+        y_train = np.concatenate((y_train, y_val))
+    else:
+        y_test = y_val
+
+
+    knn_preds, knn_probs = knn_predict(X_train, X_test, y_train, None, probs = True)
+
+    logistic_preds, logistic_probs = logistic_predict(X_train, X_test, y_train, None, probs = True)
+
+    fig, ax = plt.subplots(figsize=(13, 10), facecolor='white',
+        layout='constrained')
+
+    RocCurveDisplay.from_predictions(
+        y_true = y_val,
+        y_pred = logistic_probs, 
+        name = "Logistic Regression",
+        ax = ax
+    )
+    RocCurveDisplay.from_predictions(
+        y_true = y_val,
+        y_pred = knn_probs, 
+        name = "KNN",
+        ax = ax
+    )
+
+    ax.plot([0, 1], [0, 1], "k--", label="chance level (AUC = 0.5)")
+    plt.xlabel("False Positive Rate")
+    plt.ylabel("True Positive Rate")
+    plt.title("ROC curves of different classifiers")
+
+    if save:
+        if final:
+            plt.savefig("plots/ROCCurvesFinal.png")
+        else:
+            plt.savefig("plots/ROCCurves.png")
+
+    if plot:
+        plt.show()
+
+def probability_KDE(y_gt, y_logistic, y_knn):
+    fig, ax = plt.subplots(figsize=(5, 5), facecolor='white',
+        layout='constrained')
+
+    sns.kdeplot(ax = ax, x = y_logistic, hue = y_gt, )
+    plt.xlabel("Assigned probability")
+    plt.title("KDE for Logistic regression probabilities")
+    plt.savefig("plots/KDELogi.png")
+
+    fig, ax = plt.subplots(figsize=(5, 5), facecolor='white',
+        layout='constrained')
+
+    sns.kdeplot(ax = ax, x = y_knn, hue = y_gt, )
+    plt.xlabel("Assigned probability")
+    plt.title("KDE for KNN probabilities")
+    plt.savefig("plots/KDEKnn.png")
+
 def main(): 
     df = load_data(METADATA_PATH, FEATURES_PATH)
 
@@ -324,25 +387,31 @@ def main():
     #                       title = "Confusion matrix Logistic regression our features",
     #                       file = "ConfusionLogiOur.png")
     
+    # Plot ROC
+    plot_roc_curves(df, final = False, plot = True, save = False) 
+
+    # Plot KDE for probabilities
+    probability_KDE(y_gt = y_test, y_logistic = logistic_probs, y_knn = knn_probs)
+ 
 
     # Print Reporting metrics
-    # X_train, X_val, X_test, y_train, y_val, y_test = dataset(df, X_MODES["features_cols"], Y_MODES["cancers"], StandardScalar = True, seed=12)
+    X_train, X_val, X_test, y_train, y_val, y_test = dataset(df, X_MODES["features_cols"], Y_MODES["cancers"], StandardScalar = True, seed=12)
     
-    # X = np.concatenate((X_train, X_val))
-    # y = np.concatenate((y_train, y_val))
+    X = np.concatenate((X_train, X_val))
+    y = np.concatenate((y_train, y_val))
     
-    # knn_preds = knn_predict(X, X_test, y, None)
+    knn_preds, knn_probs = knn_predict(X, X_test, y, None, probs = True)
 
-    # logistic_preds, logistic_probs = logistic_predict(X,X_test, y, None, probs= True)
+    logistic_preds, logistic_probs = logistic_predict(X,X_test, y, None, probs= True)
 
-    # print((f"Scores KNN:\n"
-    #       f"    Accuracy = {accuracy_score(y_test, knn_preds)} \n"
-    #       f"    F1 = {f1_score(y_test, knn_preds)} \n"
-    #       f"Scores Logistic Regression:\n"
-    #       f"    Accuracy = {accuracy_score(y_test, logistic_preds)} \n"
-    #       f"    ROC = {roc_auc_score(y_test, logistic_probs)} \n"
-    #       f"    F1 = {f1_score(y_test, logistic_preds)} \n"
-    #       ))
+    print((f"Scores KNN:\n"
+          f"    Accuracy = {accuracy_score(y_test, knn_preds)} \n"
+          f"    F1 = {f1_score(y_test, knn_preds)} \n"
+          f"Scores Logistic Regression:\n"
+          f"    Accuracy = {accuracy_score(y_test, logistic_preds)} \n"
+          f"    ROC = {roc_auc_score(y_test, logistic_probs)} \n"
+          f"    F1 = {f1_score(y_test, logistic_preds)} \n"
+          ))
 
     # cm = confusion_matrix(y_test, knn_preds, labels=[0,1])
     # disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=[0,1])
@@ -361,7 +430,9 @@ def main():
     # plt.show()
 
     # Generate classifier:
-    dump_classifier()
+    # dump_classifier()
+
+    
 
 
 if __name__ == "__main__":
